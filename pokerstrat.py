@@ -5,6 +5,7 @@ from collections import Counter
 from functools import reduce
 from numpy import mean
 
+
 def simple_gen():
     primes = {}
     q = 2
@@ -35,7 +36,8 @@ def straight_hash_list():
         straight_comb_hash.add(reduce(lambda x, y: x*y, pos_straight))
     return straight_comb_hash
 
-def get_card_sets(input_file='deck.input'):
+
+def get_card_sets(input_file='test_case.input'):
     cases = read_input(input_file)
     for element in cases:
         yield element
@@ -159,7 +161,6 @@ def performance_test():
         main()
         timings.append(time()-start_time)
     print(mean(timings))
-
 
 
 if __name__ == '__main__':
