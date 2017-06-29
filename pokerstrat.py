@@ -146,6 +146,7 @@ def main():
         rank_board = []
         for case in reachable_hand(hand, deck):
             rank_board.append((rank_hand(case), case))
+            print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
         data.append(answer)
     write_output(data, 'deck.output')

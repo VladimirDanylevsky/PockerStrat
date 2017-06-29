@@ -11,7 +11,7 @@ def generate_card():
 
 
 def main():
-    number_of_cases = 1000
+    number_of_cases = 100000
     number_of_card = 10
     data = []
     for i in range(number_of_cases):
