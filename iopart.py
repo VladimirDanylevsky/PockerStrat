@@ -11,7 +11,9 @@ def read_input(name_of_file=NAME_IN):
 
 def write_output(data, name_of_file=NAME_OUT):
     with open(name_of_file, 'w') as file_desc:
-        for number_of_case, value in enumerate(data):
-            output = f"Case #{number_of_case+1}: {value}\n"
+        for hand, deck, best_hand in data:
+            hand = ' '.join(hand)
+            deck = ' '.join(deck)
+            output = f"Hand: {str(hand)} Deck: {deck} Best hand: {best_hand}\n"
             file_desc.write(output)
 

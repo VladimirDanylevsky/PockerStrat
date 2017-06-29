@@ -1,9 +1,9 @@
-from iopart import read_input
-from timeit import timeit
+from iopart import read_input, write_output
+from time import time
 from itertools import combinations
 from collections import Counter
 from functools import reduce
-
+from numpy import mean
 
 def simple_gen():
     primes = {}
@@ -133,23 +133,35 @@ def rank_hand(case):
 
 
 def main():
+    data = []
     for element in get_card_sets():
         case = element.split(' ')
         if len(case)-1:
             hand, deck = case[0:5], case[5:]
+            answer = [hand, deck]
         else:
             continue
         rank_board = []
         for case in reachable_hand(hand, deck):
             rank_board.append((rank_hand(case), case))
-        answer = max(rank_board, key=lambda x: x[0][1])
-        print(answer)
+        answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
+        data.append(answer)
+    write_output(data, 'deck.output')
     #print(mangled_values())
     #print(straight_hash_list())
     #print(rank_board)
 
 
+def performance_test():
+    timings = []
+    for element in range(10):
+        start_time = time()
+        main()
+        timings.append(time()-start_time)
+    print(mean(timings))
+
 
 
 if __name__ == '__main__':
     main()
+    #performance_test()
