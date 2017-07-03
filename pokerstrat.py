@@ -4,20 +4,11 @@ from itertools import combinations
 from collections import Counter
 from functools import reduce
 from numpy import mean
+from multiprocessing import Pool
+from primes_generator import simple_gen
 
 
-def simple_gen():
-    primes = {}
-    q = 2
-    while True:
-        if q not in primes:
-            yield q
-            primes[q*q] = [q]
-        else:
-            for p in primes[q]:
-                primes.setdefault(p+q, []).append(p)
-            del primes[q]
-        q += 1
+#TODO preserve order after mp execution
 
 
 def mangled_values():
@@ -37,10 +28,25 @@ def straight_hash_list():
     return straight_comb_hash
 
 
-def get_card_sets(input_file='test_case.input'):
+def get_card_sets(input_file='deck.input'):
     cases = read_input(input_file)
     for element in cases:
         yield element
+
+
+def batch_process(number_of_workers=4):
+    worker = 0
+    data = []
+    for element in range(number_of_workers):
+        data.append([])
+    for element in get_card_sets():
+        if worker < number_of_workers:
+            data[worker].append(element)
+            worker += 1
+        else:
+            worker = 1
+            data[0].append(element)
+    return data
 
 
 def decompose(iterable):
@@ -134,9 +140,9 @@ def rank_hand(case):
     return 'highest card', highest_card_value[evaluation['biggest']]
 
 
-def main():
-    data = []
-    for element in get_card_sets():
+def main(data):
+    answers = []
+    for element in data:
         case = element.split(' ')
         if len(case)-1:
             hand, deck = case[0:5], case[5:]
@@ -146,10 +152,11 @@ def main():
         rank_board = []
         for case in reachable_hand(hand, deck):
             rank_board.append((rank_hand(case), case))
-            print(rank_hand(case), case)
+            #print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
-        data.append(answer)
-    write_output(data, 'deck.output')
+        answers.append(answer)
+    name = str(time())
+    write_output(answers, name)
     #print(mangled_values())
     #print(straight_hash_list())
     #print(rank_board)
@@ -157,13 +164,23 @@ def main():
 
 def performance_test():
     timings = []
-    for element in range(10):
+    for element in range(1):
         start_time = time()
-        main()
+        test_space()
         timings.append(time()-start_time)
     print(mean(timings))
 
 
+def test_space():
+    data = batch_process()
+    with Pool(processes=4) as pool:
+        pool.map(main, data)
+
+    pool.close()
+    pool.join()
+
+
 if __name__ == '__main__':
-    main()
-    #performance_test()
+    #main()
+    performance_test()
+    #test_space()
