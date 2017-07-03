@@ -6,7 +6,7 @@ from functools import reduce
 from numpy import mean
 from multiprocessing import Pool
 from primes_generator import simple_gen
-
+import cProfile
 
 #TODO preserve order after mp execution
 
@@ -140,7 +140,7 @@ def rank_hand(case):
     return 'highest card', highest_card_value[evaluation['biggest']]
 
 
-def main(data):
+def main(data=get_card_sets('deck.input')):
     answers = []
     for element in data:
         case = element.split(' ')
@@ -155,18 +155,15 @@ def main(data):
             #print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
         answers.append(answer)
-    name = str(time())
+    name = 'deck.output'
     write_output(answers, name)
-    #print(mangled_values())
-    #print(straight_hash_list())
-    #print(rank_board)
 
 
-def performance_test():
+def performance_test(number_of_tests=10):
     timings = []
-    for element in range(1):
+    for element in range(number_of_tests):
         start_time = time()
-        test_space()
+        main()
         timings.append(time()-start_time)
     print(mean(timings))
 
@@ -175,12 +172,16 @@ def test_space():
     data = batch_process()
     with Pool(processes=4) as pool:
         pool.map(main, data)
-
     pool.close()
     pool.join()
 
 
 if __name__ == '__main__':
-    #main()
-    performance_test()
+    pr = cProfile.Profile()
+    pr.enable()
+    performance_test(number_of_tests=1)
+    pr.disable()
+    pr.print_stats()
+    #performance_test()
     #test_space()
+    #main(data_elements)
