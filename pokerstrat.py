@@ -8,8 +8,6 @@ from multiprocessing import Pool
 from primes_generator import simple_gen
 import cProfile
 
-#TODO preserve order after mp execution
-
 
 def mangled_values():
     cards = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
@@ -34,12 +32,12 @@ def get_card_sets(input_file='deck.input'):
         yield element
 
 
-def batch_process(number_of_workers=4):
+def batch_process(number_of_workers=4, name='deck.input'):
     worker = 0
     data = []
     for element in range(number_of_workers):
         data.append([])
-    for element in get_card_sets():
+    for element in get_card_sets(name):
         if worker < number_of_workers:
             data[worker].append(element)
             worker += 1
@@ -100,8 +98,7 @@ def find_hash(values, card_rankings=mangled_values()):
     return hash_number
 
 
-def is_straight(case):
-    straight_hashes = straight_hash_list()
+def is_straight(case, straight_hashes=straight_hash_list()):
     values, _ = decompose(case)
     if find_hash(values) in straight_hashes:
         return True
@@ -137,7 +134,7 @@ def rank_hand(case, card_points=mangled_values()):
     return 'highest card', card_points[evaluation['biggest']]
 
 
-def main(data=get_card_sets('deck.input')):
+def main(data=get_card_sets('test.input')):
     answers = []
     card_ranking = mangled_values()
     for element in data:
@@ -153,33 +150,39 @@ def main(data=get_card_sets('deck.input')):
             #print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
         answers.append(answer)
-    name = 'deck.output'
+    #name = 'deck.output'
+    name = str(time())
     write_output(answers, name)
 
 
-def performance_test(number_of_tests=10):
+def performance_test(name='test_case.input', number_of_tests=10):
     timings = []
     for element in range(number_of_tests):
         start_time = time()
-        main()
+        #main(data=get_card_sets(name))
+        mp_realization()
         timings.append(time()-start_time)
     print(mean(timings))
 
 
-def test_space():
-    data = batch_process()
+def mp_realization(name_of_file='test_case.input'):
+    data = batch_process(name=name_of_file)
     with Pool(processes=4) as pool:
         pool.map(main, data)
     pool.close()
     pool.join()
 
 
-if __name__ == '__main__':
+def profile_fun():
     pr = cProfile.Profile()
     pr.enable()
     performance_test(number_of_tests=1)
     pr.disable()
     pr.print_stats()
-    #performance_test()
-    #test_space()
-    #main(data_elements)
+
+
+if __name__ == '__main__':
+    #profile_fun()
+    #performance_test(number_of_tests=3)
+    main()
+    #mp_realization()
