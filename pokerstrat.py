@@ -17,10 +17,10 @@ def mangled_values():
     return mangle_dict
 
 
-def straight_hash_list():
+def straight_hash_list(card_rankings=mangled_values()):
     length = 5
     straight_comb_hash = set()
-    digits = list(mangled_values().values())
+    digits = list(card_rankings.values())
     list_of_digits = [digits[-1]] + digits
     for i in range(len(list_of_digits)-length+1):
         pos_straight = list_of_digits[i:i+length]
@@ -58,7 +58,7 @@ def decompose(iterable):
     return values, suits
 
 
-def find_stat(case):
+def find_stat(case, card_ranking=mangled_values()):
     stat = {'suits': [], 'ace': [], 'triple': [], 'pair': []}
     values, suits = decompose(case)
     same_suit = Counter(suits)
@@ -76,8 +76,7 @@ def find_stat(case):
             stat['pair'] += value
         elif same_value[value] > 1:
             stat['pair'] += value
-    value_score = mangled_values()
-    stat['biggest'] = max(values, key=lambda p: value_score[p])
+    stat['biggest'] = max(values, key=lambda p: card_ranking[p])
     return stat
 
 
@@ -94,11 +93,10 @@ def reachable_hand(hand, deck):
     yield deck
 
 
-def find_hash(values):
+def find_hash(values, card_rankings=mangled_values()):
     hash_number = 1
-    digit_value = mangled_values()
     for element in values:
-        hash_number *= digit_value[element]
+        hash_number *= card_rankings[element]
     return hash_number
 
 
@@ -113,7 +111,7 @@ def is_straight(case):
 def rank_hand(case, card_points=mangled_values()):
     combination_value = {'straight-flush': 800, 'four-of-a-kind': 700, 'full-house': 600, 'flush': 500,
                          'straight': 400, 'three-of-a-kind': 300, 'two-pair': 200, 'one-pair': 100}
-    evaluation = find_stat(case)
+    evaluation = find_stat(case, card_ranking=card_points)
     straight_flag = is_straight(case)
     flush_flag = False
     if evaluation['suits']:
