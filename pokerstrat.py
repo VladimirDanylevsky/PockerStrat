@@ -110,8 +110,7 @@ def is_straight(case):
     return False
 
 
-def rank_hand(case):
-    highest_card_value = mangled_values()
+def rank_hand(case, card_points=mangled_values()):
     combination_value = {'straight-flush': 800, 'four-of-a-kind': 700, 'full-house': 600, 'flush': 500,
                          'straight': 400, 'three-of-a-kind': 300, 'two-pair': 200, 'one-pair': 100}
     evaluation = find_stat(case)
@@ -120,28 +119,29 @@ def rank_hand(case):
     if evaluation['suits']:
         flush_flag = True  # check for straight, we have ,at least, flush
         if straight_flag:
-            return 'straight-flush', combination_value['straight-flush'] + highest_card_value[evaluation['biggest']]
+            return 'straight-flush', combination_value['straight-flush'] + card_points[evaluation['biggest']]
     if evaluation['ace']:
         # second highest hand - ace
-        return 'four-of-a-kind', combination_value['four-of-a-kind'] + highest_card_value[evaluation['biggest']]
+        return 'four-of-a-kind', combination_value['four-of-a-kind'] + card_points[evaluation['biggest']]
     if evaluation['triple']:
         if len(evaluation['pair']) > 1:  # check for full-house
-            return 'full-house', combination_value['full-house'] + highest_card_value[evaluation['biggest']]
+            return 'full-house', combination_value['full-house'] + card_points[evaluation['biggest']]
     if flush_flag:
-        return 'flush', combination_value['flush'] + highest_card_value[evaluation['biggest']]
+        return 'flush', combination_value['flush'] + card_points[evaluation['biggest']]
     if straight_flag:
-        return 'straight', combination_value['straight'] + highest_card_value[evaluation['biggest']]
+        return 'straight', combination_value['straight'] + card_points[evaluation['biggest']]
     if evaluation['triple']:
-        return 'three-of-a-kind', combination_value['three-of-a-kind'] + highest_card_value[evaluation['biggest']]
+        return 'three-of-a-kind', combination_value['three-of-a-kind'] + card_points[evaluation['biggest']]
     if len(evaluation['pair']) > 1:
-        return 'two-pair', combination_value['two-pair'] + highest_card_value[evaluation['biggest']]
+        return 'two-pair', combination_value['two-pair'] + card_points[evaluation['biggest']]
     if evaluation['pair']:
-        return 'one-pair', combination_value['one-pair'] + highest_card_value[evaluation['biggest']]
-    return 'highest card', highest_card_value[evaluation['biggest']]
+        return 'one-pair', combination_value['one-pair'] + card_points[evaluation['biggest']]
+    return 'highest card', card_points[evaluation['biggest']]
 
 
 def main(data=get_card_sets('deck.input')):
     answers = []
+    card_ranking = mangled_values()
     for element in data:
         case = element.split(' ')
         if len(case)-1:
@@ -151,7 +151,7 @@ def main(data=get_card_sets('deck.input')):
             continue
         rank_board = []
         for case in reachable_hand(hand, deck):
-            rank_board.append((rank_hand(case), case))
+            rank_board.append((rank_hand(case, card_points=card_ranking), case))
             #print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
         answers.append(answer)
