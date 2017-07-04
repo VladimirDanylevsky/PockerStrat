@@ -13,9 +13,11 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
 #Test data
 .input
 .output
+
 # Windows shortcuts
 *.lnk
 
