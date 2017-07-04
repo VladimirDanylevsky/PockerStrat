@@ -19,7 +19,7 @@ def main():
         for j in range(number_of_card):
             case.append(generate_card())
         data.append(case)
-    print(data)
+
     with open('test_case.input', 'w') as test_case:
         for element in data:
             test_case.write(' '.join(element)+'\n')

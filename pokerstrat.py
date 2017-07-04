@@ -135,7 +135,7 @@ def rank_hand(case, card_points=mangled_values()):
     return 'highest card', card_points[evaluation['biggest']]
 
 
-def main(data, name_of_file='deck.input'):
+def main(data, name_of_file='deck.input', show_best_hand=False, silent=False):
     start_time = time()
     if not data:
         data = get_card_sets(name_of_file)
@@ -152,13 +152,17 @@ def main(data, name_of_file='deck.input'):
         for case in reachable_hand(hand, deck):
             rank_board.append((rank_hand(case, card_points=card_ranking), case))
             # print(rank_hand(case), case)
-        answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
+        if not show_best_hand:
+            answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
+        else:
+            answer.append((max(rank_board, key=lambda x: x[0][1])))
         answers.append(answer)
-    print('Elapsed time:',(time() - start_time))
+    print('Elapsed time:', (time() - start_time), 'by ', getpid(), 'process')
     # name = 'deck.output'
-    name = str(getpid())+'_'+str(time())+'.output'
-    write_output(answers, name)
-    return None
+    name = str(time())+'_'+str(getpid())+'.output'
+    if not silent:
+        write_output(answers, name)
+    return answers
 
 
 # def performance_test(name='test_case.input', number_of_tests=10):
