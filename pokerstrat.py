@@ -6,7 +6,7 @@ from functools import reduce
 from numpy import mean
 from multiprocessing import Pool
 from primes_generator import simple_gen
-import cProfile
+# import cProfile
 
 
 def mangled_values():
@@ -134,7 +134,9 @@ def rank_hand(case, card_points=mangled_values()):
     return 'highest card', card_points[evaluation['biggest']]
 
 
-def main(data=get_card_sets('test.input')):
+def main(data, name_of_file='deck.input'):
+    if not data:
+        data = get_card_sets(name_of_file)
     answers = []
     card_ranking = mangled_values()
     for element in data:
@@ -147,42 +149,43 @@ def main(data=get_card_sets('test.input')):
         rank_board = []
         for case in reachable_hand(hand, deck):
             rank_board.append((rank_hand(case, card_points=card_ranking), case))
-            #print(rank_hand(case), case)
+            # print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
         answers.append(answer)
-    #name = 'deck.output'
-    name = str(time())
+    # name = 'deck.output'
+    name = str(time())+'.output'
     write_output(answers, name)
 
 
-def performance_test(name='test_case.input', number_of_tests=10):
-    timings = []
-    for element in range(number_of_tests):
-        start_time = time()
-        #main(data=get_card_sets(name))
-        mp_realization()
-        timings.append(time()-start_time)
-    print(mean(timings))
+# def performance_test(name='test_case.input', number_of_tests=10):
+#    timings = []
+#    for element in range(number_of_tests):
+#        start_time = time()
+#        # main(data=get_card_sets(name))
+#        mp_realization()
+#        timings.append(time()-start_time)
+#    print(mean(timings))
 
 
-def mp_realization(name_of_file='test_case.input'):
-    data = batch_process(name=name_of_file)
-    with Pool(processes=4) as pool:
+def mp_realization(number_of_w=4, name_of_file='deck.input'):
+    data = batch_process(number_of_workers=number_of_w, name=name_of_file)
+    len(data)
+    with Pool(processes=number_of_w) as pool:
         pool.map(main, data)
     pool.close()
     pool.join()
 
 
-def profile_fun():
-    pr = cProfile.Profile()
-    pr.enable()
-    performance_test(number_of_tests=1)
-    pr.disable()
-    pr.print_stats()
+# def profile_fun():
+#    pr = cProfile.Profile()
+#    pr.enable()
+#    performance_test(number_of_tests=1)
+#    pr.disable()
+#    pr.print_stats()
 
 
 if __name__ == '__main__':
-    #profile_fun()
-    #performance_test(number_of_tests=3)
+    # profile_fun()
+    # performance_test(number_of_tests=3)
     main()
-    #mp_realization()
+    # mp_realization()
