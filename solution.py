@@ -1,5 +1,6 @@
 import argparse
 from pokerstrat import main, mp_realization
+from os import path
 
 
 parser = argparse.ArgumentParser(description='The Psychic Poker Player, solution by Vladimir Danylevski. '
@@ -21,11 +22,13 @@ if __name__ == '__main__':
             args.number_of_w = int(args.name)
             args.name = None
     if not args.name:
-        print('Default case, Input: \'deck.input\', Output: \'[timestamp].output\'')
+        print('Default case, Input: \'deck.input\', Output: \'[pid][timestamp].output\'')
         nm = 'deck.input' # default
     else:
         print(f'Input \'{args.name}\', Output: \'deck.output\'')
         nm = args.name.strip('\"\'')
+    if not path.exists(nm):
+        raise FileNotFoundError
     if not args.MULTPROC:
         print('Using 1 logical core')
         main(name_of_file=nm, data=False)

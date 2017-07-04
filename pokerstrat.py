@@ -4,6 +4,7 @@ from itertools import combinations
 from collections import Counter
 from functools import reduce
 from numpy import mean
+from os import getpid
 from multiprocessing import Pool
 from primes_generator import simple_gen
 # import cProfile
@@ -135,6 +136,7 @@ def rank_hand(case, card_points=mangled_values()):
 
 
 def main(data, name_of_file='deck.input'):
+    start_time = time()
     if not data:
         data = get_card_sets(name_of_file)
     answers = []
@@ -152,9 +154,11 @@ def main(data, name_of_file='deck.input'):
             # print(rank_hand(case), case)
         answer.append((max(rank_board, key=lambda x: x[0][1]))[0][0])
         answers.append(answer)
+    print('Elapsed time:',(time() - start_time))
     # name = 'deck.output'
-    name = str(time())+'.output'
+    name = str(getpid())+'_'+str(time())+'.output'
     write_output(answers, name)
+    return None
 
 
 # def performance_test(name='test_case.input', number_of_tests=10):
@@ -169,7 +173,6 @@ def main(data, name_of_file='deck.input'):
 
 def mp_realization(number_of_w=4, name_of_file='deck.input'):
     data = batch_process(number_of_workers=number_of_w, name=name_of_file)
-    len(data)
     with Pool(processes=number_of_w) as pool:
         pool.map(main, data)
     pool.close()
